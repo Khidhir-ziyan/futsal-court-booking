@@ -1,0 +1,59 @@
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model Admin {
+  id       String @id @default(uuid())
+  username String @unique
+  password String
+}
+
+model Location {
+  id       String   @id @default(uuid())
+  name     String
+  address  String
+  fields   Field[]
+  payments PaymentMethod[]
+}
+
+model Field {
+  id           String    @id @default(uuid())
+  name         String
+  type         String
+  pricePerHour Float
+  image        String    @default("")
+  description  String    @default("")
+  locationId   String
+  location     Location  @relation(fields: [locationId], references: [id])
+  bookings     Booking[]
+}
+
+model Booking {
+  id         String   @id @default(uuid())
+  customer   String
+  whatsapp   String
+  status     BookingStatus @default(PENDING)
+  slotTime   String
+  date       DateTime @default(now())
+  fieldId    String
+  field      Field    @relation(fields: [fieldId], references: [id])
+}
+
+enum BookingStatus {
+  PENDING
+  APPROVED
+  REJECTED
+}
+
+model PaymentMethod {
+  id         String   @id @default(uuid())
+  type       String   // QRIS, Bank Transfer
+  details    String
+  locationId String
+  location   Location @relation(fields: [locationId], references: [id])
+}

@@ -1,0 +1,21 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --color-canvas: #000000;
+  --color-primary: #ffffff;
+  --color-body: #cccccc;
+  --color-muted: #999999;
+  --color-link: #c3d9f3;
+  --color-surface-card: #141414;
+  --color-hairline: #262626;
+}
+
+body {
+  margin: 0;
+  background-color: var(--color-canvas);
+  color: var(--color-primary);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}

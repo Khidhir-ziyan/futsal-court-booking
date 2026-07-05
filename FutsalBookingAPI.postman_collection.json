@@ -1,0 +1,233 @@
+{
+  "info": {
+    "name": "Futsal Booking API",
+    "description": "Multi-Venue Futsal Booking System API. Run backend on port 5000 first.\n\nBase URL: http://localhost:5000",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:5000"
+    },
+    {
+      "key": "token",
+      "value": ""
+    }
+  ],
+  "item": [
+    {
+      "name": "Health Check",
+      "item": [
+        {
+          "name": "GET /health",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/health",
+            "description": "Check if backend is running"
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Public - Booking",
+      "description": "Endpoints that don't require authentication.",
+      "item": [
+        {
+          "name": "GET /api/bookings/fields",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/api/bookings/fields",
+            "description": "Get all fields with their locations. Used by StoreProvider on app load."
+          },
+          "response": []
+        },
+        {
+          "name": "GET /api/bookings/bookings",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/api/bookings/bookings?fieldId=f1&date=2026-07-06",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "bookings", "bookings"],
+              "query": [
+                { "key": "fieldId", "value": "f1", "description": "Field UUID or ID" },
+                { "key": "date", "value": "2026-07-06", "description": "Date in YYYY-MM-DD format" }
+              ]
+            },
+            "description": "Get bookings for a specific field on a date. Used to check slot availability."
+          },
+          "response": []
+        },
+        {
+          "name": "POST /api/bookings/book",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status is 201 or 409', function () {",
+                  "    pm.expect(pm.response.code).to.be.oneOf([201, 409]);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "url": "{{baseUrl}}/api/bookings/book",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"customer\": \"John Doe\",\n  \"whatsapp\": \"08123456789\",\n  \"fieldId\": \"f1\",\n  \"slotTime\": \"08:00 - 10:00\",\n  \"date\": \"2026-07-06\"\n}"
+            },
+            "description": "Create a guest booking. Returns 201 with booking on success, 409 if slot already booked, 201 with local ID if field not in DB."
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Admin - Auth",
+      "description": "Authentication endpoints. No JWT required.",
+      "item": [
+        {
+          "name": "POST /api/admin/seed",
+          "request": {
+            "method": "POST",
+            "url": "{{baseUrl}}/api/admin/seed",
+            "description": "Seed default admin account (username: admin, password: admin123). Safe to call multiple times — only creates if no admins exist."
+          },
+          "response": []
+        },
+        {
+          "name": "POST /api/admin/login",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 200) {",
+                  "    var data = pm.response.json();",
+                  "    pm.collectionVariables.set('token', data.token);",
+                  "    console.log('Token saved to collection variable');",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "url": "{{baseUrl}}/api/admin/login",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"username\": \"admin\",\n  \"password\": \"admin123\"\n}"
+            },
+            "description": "Admin login. Returns JWT token. Token is auto-saved to collection variable 'token' for subsequent requests."
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Admin - Bookings (JWT Required)",
+      "description": "All endpoints in this folder require Authorization: Bearer <token>",
+      "item": [
+        {
+          "name": "GET /api/admin/bookings",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/api/admin/bookings",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "description": "Get all bookings with field and location data. Used by AdminDashboard."
+          },
+          "response": []
+        },
+        {
+          "name": "PATCH /api/admin/bookings/:id/status",
+          "request": {
+            "method": "PATCH",
+            "url": {
+              "raw": "{{baseUrl}}/api/admin/bookings/BOOKING_ID/status",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "admin", "bookings", "BOOKING_ID", "status"]
+            },
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"status\": \"APPROVED\"\n}"
+            },
+            "description": "Update booking status. Replace BOOKING_ID with actual UUID. Status: APPROVED or REJECTED."
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Admin - Fields (JWT Required)",
+      "description": "All endpoints in this folder require Authorization: Bearer <token>",
+      "item": [
+        {
+          "name": "GET /api/admin/fields",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/api/admin/fields",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "description": "Get all fields with locations. Used by AdminDashboard."
+          },
+          "response": []
+        },
+        {
+          "name": "POST /api/admin/fields",
+          "request": {
+            "method": "POST",
+            "url": "{{baseUrl}}/api/admin/fields",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"New Court\",\n  \"type\": \"Synthetic\",\n  \"pricePerHour\": 150000,\n  \"locationName\": \"Depok Branch\",\n  \"image\": \"https://images.unsplash.com/photo-1630420598913-44208d36f9af?q=80&w=1200&auto=format&fit=crop\",\n  \"description\": \"Professional grade synthetic turf.\"\n}"
+            },
+            "description": "Create a new field. Location is free text — auto-created if doesn't exist. image and description are optional."
+          },
+          "response": []
+        },
+        {
+          "name": "PATCH /api/admin/fields/:id",
+          "request": {
+            "method": "PATCH",
+            "url": {
+              "raw": "{{baseUrl}}/api/admin/fields/FIELD_ID",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "admin", "fields", "FIELD_ID"]
+            },
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Updated Court Name\",\n  \"type\": \"Vinyl\",\n  \"pricePerHour\": 120000,\n  \"locationName\": \"Jakarta Branch\",\n  \"image\": \"https://new-image-url.jpg\",\n  \"description\": \"Updated description.\"\n}"
+            },
+            "description": "Update a field. Replace FIELD_ID with actual UUID. All body fields are optional — only send what you want to change."
+          },
+          "response": []
+        }
+      ]
+    }
+  ]
+}
