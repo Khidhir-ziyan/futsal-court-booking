@@ -180,7 +180,7 @@ const LandingPage: React.FC<Props> = ({ onAdminClick }) => {
 
             {/* Story 2 */}
             <StorySection 
-              image="https://images.unsplash.com/photo-1575377146707-f47cd7376682?q=80&w=1920" 
+              image="https://images.unsplash.com/photo-1695950695168-f4038b55a9ca?q=80&w=876&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D" 
               text="A legacy of luxury. A future of sport." 
             />
           </motion.div>
