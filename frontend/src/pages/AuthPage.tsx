@@ -10,8 +10,6 @@ const AuthPage: React.FC<Props> = ({ onSuccess, onBack }) => {
   const [password, setPassword] = useState('')
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
-  const [seedMsg, setSeedMsg] = useState('')
-  const [seeding, setSeeding] = useState(false)
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -94,31 +92,6 @@ const AuthPage: React.FC<Props> = ({ onSuccess, onBack }) => {
             {loading ? 'Signing in...' : 'Sign In'}
           </button>
         </form>
-
-        <div className="mt-8 text-center">
-          <button
-            type="button"
-            onClick={async () => {
-              setSeeding(true)
-              setSeedMsg('')
-              try {
-                const res = await fetch('/api/admin/seed', { method: 'POST' })
-                const data = await res.json()
-                setSeedMsg(data.message || 'Seeded')
-              } catch {
-                setSeedMsg('Seed failed')
-              }
-              setSeeding(false)
-            }}
-            disabled={seeding}
-            className="font-mono text-[10px] uppercase tracking-caption text-muted hover:text-link transition-colors bg-transparent border-none cursor-pointer disabled:opacity-50"
-          >
-            {seeding ? 'Creating...' : 'Create default admin account'}
-          </button>
-          {seedMsg && (
-            <div className="font-mono text-[10px] uppercase tracking-caption mt-2 text-muted">{seedMsg}</div>
-          )}
-        </div>
 
         <div className="text-center mt-8">
           <button
