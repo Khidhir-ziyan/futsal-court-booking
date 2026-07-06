@@ -2,8 +2,6 @@
 
 Guest checkout futsal court booking across multiple locations, with centralized admin management.
 
-**Author:** Khidhir (NIM: 24110400007)
-**Course:** Web Advanced Development — Final Exam Project
 
 ---
 
