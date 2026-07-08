@@ -324,7 +324,7 @@ const LandingPage: React.FC<Props> = ({ onAdminClick }) => {
         <div className="max-w-[1280px] mx-auto flex flex-col items-center">
           <div className="font-display text-[14px] uppercase tracking-wordmark text-primary mb-8">Live within sport</div>
           <p className="font-text text-sm text-center max-w-md">
-            © 2026 Futsal Booking System. just created for final exam.
+            © 2026 Futsal Booking System. By khidhir.
           </p>
         </div>
       </footer>
