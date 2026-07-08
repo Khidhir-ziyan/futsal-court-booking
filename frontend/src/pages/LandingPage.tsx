@@ -18,6 +18,10 @@ const LandingPage: React.FC<Props> = ({ onAdminClick }) => {
   const [selectedDate, setSelectedDate] = useState(new Date().toISOString().split('T')[0])
   const [bookingStatus, setBookingStatus] = useState<'browsing' | 'scheduling' | 'checkout' | 'success'>('browsing')
   const [isMenuOpen, setIsMenuOpen] = useState(false)
+  const [fieldPage, setFieldPage] = useState(0)
+  const FIELDS_PER_PAGE = 6
+  const fieldPages = Math.ceil(fields.length / FIELDS_PER_PAGE)
+  const paginatedFields = fields.slice(fieldPage * FIELDS_PER_PAGE, (fieldPage + 1) * FIELDS_PER_PAGE)
 
   const handleFieldSelect = async (field: any) => {
     setSelectedField(field)
@@ -146,7 +150,7 @@ const LandingPage: React.FC<Props> = ({ onAdminClick }) => {
                 Our Venues
               </h2>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
-                {(fields).map((field: any) => (
+                {paginatedFields.map((field: any) => (
                   <motion.div 
                     key={field.id} 
                     whileHover={{ y: -10 }}
@@ -176,6 +180,39 @@ const LandingPage: React.FC<Props> = ({ onAdminClick }) => {
                   </motion.div>
                 ))}
               </div>
+              {fieldPages > 1 && (
+                <div className="flex justify-center gap-4 mt-12">
+                  <button
+                    onClick={() => setFieldPage(p => Math.max(0, p - 1))}
+                    disabled={fieldPage === 0}
+                    className="font-mono text-[11px] uppercase tracking-caption text-muted hover:text-primary transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
+                  >
+                    ← Prev
+                  </button>
+                  <div className="flex gap-2">
+                    {Array.from({ length: fieldPages }, (_, i) => (
+                      <button
+                        key={i}
+                        onClick={() => setFieldPage(i)}
+                        className={`w-8 h-8 border font-mono text-[11px] transition-colors ${
+                          i === fieldPage
+                            ? 'border-primary text-primary bg-primary/10'
+                            : 'border-hairline text-muted hover:border-primary hover:text-primary'
+                        }`}
+                      >
+                        {i + 1}
+                      </button>
+                    ))}
+                  </div>
+                  <button
+                    onClick={() => setFieldPage(p => Math.min(fieldPages - 1, p + 1))}
+                    disabled={fieldPage === fieldPages - 1}
+                    className="font-mono text-[11px] uppercase tracking-caption text-muted hover:text-primary transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
+                  >
+                    Next →
+                  </button>
+                </div>
+              )}
             </section>
 
             {/* Story 2 */}
